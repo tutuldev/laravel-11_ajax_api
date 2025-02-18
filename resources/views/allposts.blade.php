@@ -59,11 +59,11 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title fs-5" id="singelPostLabel">Modal title</h5>
+          <h5 class="modal-title fs-5" id="singelPostLabel">Singel Post</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          ...
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -105,7 +105,7 @@ fetch('/api/posts',{
 .then(response => response.json())
 .then(data =>{
     // console.log(data);
-    console.log(data.data.posts);
+    // console.log(data.data.posts);
     var allpost = data.data.posts;
     const postContainer = document.querySelector("#postContainer");
               var tabledata= `  <table class="table table-bordered table-striped ">
@@ -118,8 +118,8 @@ fetch('/api/posts',{
                                 <th>Delete</th>
                             </tr>`;
 
-                            allpost.forEach(post =>{
-                               tabledata +=`<tr>
+                            allpost.forEach(post => {
+                               tabledata += `<tr>
                                 <td><img src="/uploads/${post.image}" alt="" width="150px" height="100px"></td>
                                 <td>
                                     <h6>${post.title}</h6></td>
@@ -131,9 +131,9 @@ fetch('/api/posts',{
                                     </p>
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-sm btn-primary data-bs-post="${post.id}" data-bs-toggle="modal" data-bs-target="#singelPostModel">View</button>
+                                    <button type="button" class="btn btn-sm btn-primary" data-bs-postid="${post.id}" data-bs-toggle="modal" data-bs-target="#singelPostModel">View</button>
                                 </td>
-                                <td><button type="button" class="btn btn-sm btn-success data-bs-post="${post.id}" data-bs-toggle="modal" data-bs-target="#updatePostModel">Update</button></td>
+                                <td><button type="button" class="btn btn-sm btn-success" data-bs-postid="${post.id}" data-bs-toggle="modal" data-bs-target="#updatePostModel">Update</button></td>
                                 <td><button class="btn btn-sm btn-danger">Delete</button></td>
                               </tr>`
                             });
@@ -145,6 +145,45 @@ fetch('/api/posts',{
 
 }
 loadData();
+// open singel post modal
+var singelMOdel = document.querySelector("#singelPostModel");
+if (singelMOdel) {
+    singelMOdel.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget
+
+    const modalBody = document.querySelector("#singelPostModel .modal-body");
+    modalBody.innerHTML = "";
+    
+    const id = button.getAttribute('data-bs-postid')
+    console.log(id);
+
+    const token = localStorage.getItem('api_token');
+
+fetch(`/api/posts/${id}`,{
+    method:'GET',
+    headers:{
+        'Authorization': `Bearer ${token}`,
+        'Content-type' : 'application/json'
+    }
+})
+.then(response => response.json())
+.then(data =>{
+    const post = data.data.post[0];
+
+
+    modalBody.innerHTML = `
+        Title: ${post.title}
+        <br>
+        Description: ${post.description}
+        <br>
+        <img widht="150" src="/uploads/${post.image}"/>
+
+    `;
+});
+
+
+  })
+}
 </script>
 </body>
 </html>
